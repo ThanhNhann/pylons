@@ -2,6 +2,7 @@ package keeper_test
 
 import (
 	"encoding/base64"
+	"fmt"
 	"math"
 
 	"github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
@@ -57,11 +58,10 @@ func (suite *IntegrationTestSuite) TestFulfillTradeMsgServerSimple2() {
 	srv := keeper.NewMsgServerImpl(k)
 
 	privKey := ed25519.GenPrivKey()
-	//creatorA := types.GenTestBech32FromString("creatorA")
-	creatorB := types.GenTestBech32FromString("creatorB")
+	creator := types.GenTestBech32FromString("creator")
 
 	msgCreate := &types.MsgCreateTrade{
-		Creator:     creatorB,
+		Creator:     creator,
 		CoinInputs:  nil,
 		ItemInputs:  nil,
 		CoinOutputs: nil,
@@ -75,12 +75,13 @@ func (suite *IntegrationTestSuite) TestFulfillTradeMsgServerSimple2() {
 		msgCreate                    types.MsgCreateTrade
 		updateCoinInputsMsgCreate    bool
 		updatePaymentInfosForProcess bool
+		setItem                      bool
 		valid                        bool
 	}{
 		{
 			desc: "Trade does not exist",
 			msgFulfill: types.MsgFulfillTrade{
-				Creator:         creatorB,
+				Creator:         creator,
 				Id:              0,
 				CoinInputsIndex: 0,
 				Items:           nil,
@@ -89,12 +90,13 @@ func (suite *IntegrationTestSuite) TestFulfillTradeMsgServerSimple2() {
 			msgCreate:                    *msgCreate,
 			updateCoinInputsMsgCreate:    false,
 			updatePaymentInfosForProcess: false,
+			setItem:                      false,
 			valid:                        false,
 		},
 		{
 			desc: "Invalid coinInputs index",
 			msgFulfill: types.MsgFulfillTrade{
-				Creator:         creatorB,
+				Creator:         creator,
 				Id:              0,
 				CoinInputsIndex: 2,
 				Items:           nil,
@@ -103,12 +105,13 @@ func (suite *IntegrationTestSuite) TestFulfillTradeMsgServerSimple2() {
 			msgCreate:                    *msgCreate,
 			updateCoinInputsMsgCreate:    true,
 			updatePaymentInfosForProcess: false,
+			setItem:                      false,
 			valid:                        false,
 		},
 		{
 			desc: "Invalid PaymentInfo",
 			msgFulfill: types.MsgFulfillTrade{
-				Creator:         creatorB,
+				Creator:         creator,
 				Id:              0,
 				CoinInputsIndex: 0,
 				Items:           nil,
@@ -127,12 +130,13 @@ func (suite *IntegrationTestSuite) TestFulfillTradeMsgServerSimple2() {
 			msgCreate:                    *msgCreate,
 			updateCoinInputsMsgCreate:    false,
 			updatePaymentInfosForProcess: false,
+			setItem:                      false,
 			valid:                        false,
 		},
 		{
 			desc: "Process PaymentInfo error",
 			msgFulfill: types.MsgFulfillTrade{
-				Creator:         creatorB,
+				Creator:         creator,
 				Id:              0,
 				CoinInputsIndex: 0,
 				Items:           nil,
@@ -149,12 +153,13 @@ func (suite *IntegrationTestSuite) TestFulfillTradeMsgServerSimple2() {
 			msgCreate:                    *msgCreate,
 			updateCoinInputsMsgCreate:    false,
 			updatePaymentInfosForProcess: true,
+			setItem:                      false,
 			valid:                        false,
 		},
 		{
 			desc: "Not enough balance to pay for trade coinInputs",
 			msgFulfill: types.MsgFulfillTrade{
-				Creator:         creatorB,
+				Creator:         creator,
 				Id:              0,
 				CoinInputsIndex: 0,
 				Items:           nil,
@@ -163,12 +168,68 @@ func (suite *IntegrationTestSuite) TestFulfillTradeMsgServerSimple2() {
 			msgCreate:                    *msgCreate,
 			updateCoinInputsMsgCreate:    true,
 			updatePaymentInfosForProcess: false,
+			setItem:                      false,
 			valid:                        false,
 		},
 		{
+			desc: "Error match ItemInputs for trade",
+			msgFulfill: types.MsgFulfillTrade{
+				Creator:         creator,
+				Id:              0,
+				CoinInputsIndex: 0,
+				Items: []types.ItemRef{
+					{
+						CookbookId: "test",
+						ItemId:     "test",
+					},
+				},
+			},
+			updateIdMsgFulfill:           false,
+			msgCreate:                    *msgCreate,
+			updateCoinInputsMsgCreate:    false,
+			updatePaymentInfosForProcess: false,
+			setItem:                      false,
+			valid:                        false,
+		},
+		{
+			desc: "Cannot be traded with item and cookbook id",
+			msgFulfill: types.MsgFulfillTrade{
+				Creator:         creator,
+				Id:              0,
+				CoinInputsIndex: 0,
+				Items: []types.ItemRef{
+					{
+						CookbookId: "",
+						ItemId:     "",
+					},
+				},
+			},
+			updateIdMsgFulfill:           false,
+			msgCreate:                    *msgCreate,
+			updateCoinInputsMsgCreate:    false,
+			updatePaymentInfosForProcess: false,
+			setItem:                      true,
+			valid:                        false,
+		},
+		// {
+		// 	desc: "Cannot use coinOutputs to pay for the items provided",
+		// 	msgFulfill: types.MsgFulfillTrade{
+		// 		Creator:         creator,
+		// 		Id:              0,
+		// 		CoinInputsIndex: 0,
+		// 		Items:           nil,
+		// 	},
+		// 	updateIdMsgFulfill:           false,
+		// 	msgCreate:                    *msgCreate,
+		// 	updateCoinInputsMsgCreate:    false,
+		// 	updatePaymentInfosForProcess: false,
+		// 	setItem:                      false,
+		// 	valid:                        false,
+		// },
+		{
 			desc: "Valid",
 			msgFulfill: types.MsgFulfillTrade{
-				Creator:         creatorB,
+				Creator:         creator,
 				Id:              0,
 				CoinInputsIndex: 0,
 				Items:           nil,
@@ -177,10 +238,13 @@ func (suite *IntegrationTestSuite) TestFulfillTradeMsgServerSimple2() {
 			msgCreate:                    *msgCreate,
 			updateCoinInputsMsgCreate:    false,
 			updatePaymentInfosForProcess: false,
+			setItem:                      false,
 			valid:                        true,
 		},
 	} {
 		suite.Run(tc.desc, func() {
+
+			//Begin config
 			if tc.updateIdMsgFulfill {
 				tc.msgFulfill.Id = math.MaxUint64
 			} else {
@@ -196,6 +260,27 @@ func (suite *IntegrationTestSuite) TestFulfillTradeMsgServerSimple2() {
 				tc.msgCreate.CoinInputs = nil
 			}
 
+			if tc.setItem {
+
+				tc.msgFulfill.Items[0].CookbookId = fmt.Sprintf("%d", index)
+				tc.msgFulfill.Items[0].ItemId = fmt.Sprintf("%d", index)
+
+				tc.msgCreate.ItemInputs = []types.ItemInput{
+					{
+						Id: fmt.Sprintf("%d", index),
+					},
+				}
+				item := &types.Item{
+					Owner:      creator,
+					CookbookId: fmt.Sprintf("%d", index),
+					Id:         fmt.Sprintf("%d", index),
+					Tradeable:  false,
+				}
+				k.SetItem(ctx, *item)
+			} else {
+				tc.msgCreate.ItemOutputs = nil
+			}
+
 			if tc.updatePaymentInfosForProcess {
 				params := k.GetParams(suite.ctx)
 				params.PaymentProcessors = append(params.PaymentProcessors, types.PaymentProcessor{
@@ -207,6 +292,8 @@ func (suite *IntegrationTestSuite) TestFulfillTradeMsgServerSimple2() {
 				})
 				k.SetParams(suite.ctx, params)
 			}
+			//End config
+
 			respCreate, err := srv.CreateTrade(wctx, &tc.msgCreate)
 			require.NoError(err)
 			require.Equal(index, int(respCreate.Id))
