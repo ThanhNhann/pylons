@@ -76,6 +76,7 @@ func (suite *IntegrationTestSuite) TestFulfillTradeMsgServerSimple2() {
 		updateCoinInputsMsgCreate    bool
 		updatePaymentInfosForProcess bool
 		setItem                      bool
+		tradeableOfItem              bool
 		valid                        bool
 	}{
 		{
@@ -91,6 +92,7 @@ func (suite *IntegrationTestSuite) TestFulfillTradeMsgServerSimple2() {
 			updateCoinInputsMsgCreate:    false,
 			updatePaymentInfosForProcess: false,
 			setItem:                      false,
+			tradeableOfItem:              false,
 			valid:                        false,
 		},
 		{
@@ -106,6 +108,7 @@ func (suite *IntegrationTestSuite) TestFulfillTradeMsgServerSimple2() {
 			updateCoinInputsMsgCreate:    true,
 			updatePaymentInfosForProcess: false,
 			setItem:                      false,
+			tradeableOfItem:              false,
 			valid:                        false,
 		},
 		{
@@ -131,6 +134,7 @@ func (suite *IntegrationTestSuite) TestFulfillTradeMsgServerSimple2() {
 			updateCoinInputsMsgCreate:    false,
 			updatePaymentInfosForProcess: false,
 			setItem:                      false,
+			tradeableOfItem:              false,
 			valid:                        false,
 		},
 		{
@@ -154,6 +158,7 @@ func (suite *IntegrationTestSuite) TestFulfillTradeMsgServerSimple2() {
 			updateCoinInputsMsgCreate:    false,
 			updatePaymentInfosForProcess: true,
 			setItem:                      false,
+			tradeableOfItem:              false,
 			valid:                        false,
 		},
 		{
@@ -169,6 +174,7 @@ func (suite *IntegrationTestSuite) TestFulfillTradeMsgServerSimple2() {
 			updateCoinInputsMsgCreate:    true,
 			updatePaymentInfosForProcess: false,
 			setItem:                      false,
+			tradeableOfItem:              false,
 			valid:                        false,
 		},
 		{
@@ -189,6 +195,7 @@ func (suite *IntegrationTestSuite) TestFulfillTradeMsgServerSimple2() {
 			updateCoinInputsMsgCreate:    false,
 			updatePaymentInfosForProcess: false,
 			setItem:                      false,
+			tradeableOfItem:              false,
 			valid:                        false,
 		},
 		{
@@ -209,23 +216,30 @@ func (suite *IntegrationTestSuite) TestFulfillTradeMsgServerSimple2() {
 			updateCoinInputsMsgCreate:    false,
 			updatePaymentInfosForProcess: false,
 			setItem:                      true,
+			tradeableOfItem:              false,
 			valid:                        false,
 		},
-		// {
-		// 	desc: "Cannot use coinOutputs to pay for the items provided",
-		// 	msgFulfill: types.MsgFulfillTrade{
-		// 		Creator:         creator,
-		// 		Id:              0,
-		// 		CoinInputsIndex: 0,
-		// 		Items:           nil,
-		// 	},
-		// 	updateIdMsgFulfill:           false,
-		// 	msgCreate:                    *msgCreate,
-		// 	updateCoinInputsMsgCreate:    false,
-		// 	updatePaymentInfosForProcess: false,
-		// 	setItem:                      false,
-		// 	valid:                        false,
-		// },
+		{
+			desc: "Cannot use CoinOutputs to pay for the items provided",
+			msgFulfill: types.MsgFulfillTrade{
+				Creator:         creator,
+				Id:              0,
+				CoinInputsIndex: 0,
+				Items: []types.ItemRef{
+					{
+						CookbookId: "",
+						ItemId:     "",
+					},
+				},
+			},
+			updateIdMsgFulfill:           false,
+			msgCreate:                    *msgCreate,
+			updateCoinInputsMsgCreate:    false,
+			updatePaymentInfosForProcess: false,
+			setItem:                      true,
+			tradeableOfItem:              true,
+			valid:                        false,
+		},
 		{
 			desc: "Valid",
 			msgFulfill: types.MsgFulfillTrade{
@@ -239,6 +253,7 @@ func (suite *IntegrationTestSuite) TestFulfillTradeMsgServerSimple2() {
 			updateCoinInputsMsgCreate:    false,
 			updatePaymentInfosForProcess: false,
 			setItem:                      false,
+			tradeableOfItem:              false,
 			valid:                        true,
 		},
 	} {
@@ -274,7 +289,11 @@ func (suite *IntegrationTestSuite) TestFulfillTradeMsgServerSimple2() {
 					Owner:      creator,
 					CookbookId: fmt.Sprintf("%d", index),
 					Id:         fmt.Sprintf("%d", index),
-					Tradeable:  false,
+				}
+				if tc.tradeableOfItem {
+					item.Tradeable = true
+				} else {
+					item.Tradeable = false
 				}
 				k.SetItem(ctx, *item)
 			} else {
