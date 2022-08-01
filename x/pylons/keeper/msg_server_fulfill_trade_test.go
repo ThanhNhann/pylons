@@ -75,6 +75,7 @@ func (suite *IntegrationTestSuite) TestFulfillTradeMsgServerSimple2() {
 		msgCreate                    types.MsgCreateTrade
 		updateCoinInputsMsgCreate    bool
 		updatePaymentInfosForProcess bool
+		updateItemOutputsMsgCreate   bool
 		setItem                      bool
 		tradeableOfItem              bool
 		valid                        bool
@@ -241,6 +242,23 @@ func (suite *IntegrationTestSuite) TestFulfillTradeMsgServerSimple2() {
 			valid:                        false,
 		},
 		{
+			desc: "CoinInputs not sufficient to pay transfer fees",
+			msgFulfill: types.MsgFulfillTrade{
+				Creator:         creator,
+				Id:              0,
+				CoinInputsIndex: 0,
+				Items:           nil,
+			},
+			updateIdMsgFulfill:           false,
+			msgCreate:                    *msgCreate,
+			updateCoinInputsMsgCreate:    false,
+			updatePaymentInfosForProcess: false,
+			updateItemOutputsMsgCreate:   true,
+			setItem:                      false,
+			tradeableOfItem:              false,
+			valid:                        false,
+		},
+		{
 			desc: "Valid",
 			msgFulfill: types.MsgFulfillTrade{
 				Creator:         creator,
@@ -311,6 +329,26 @@ func (suite *IntegrationTestSuite) TestFulfillTradeMsgServerSimple2() {
 				})
 				k.SetParams(suite.ctx, params)
 			}
+
+			if tc.updateItemOutputsMsgCreate {
+				tc.msgCreate.ItemOutputs = []types.ItemRef{
+					{
+						CookbookId: fmt.Sprintf("%d", index),
+						ItemId:     fmt.Sprintf("%d", index),
+					},
+				}
+				item := &types.Item{
+					Owner:      creator,
+					CookbookId: fmt.Sprintf("%d", index),
+					Id:         fmt.Sprintf("%d", index),
+					Tradeable:  true,
+				}
+
+				k.SetItem(ctx, *item)
+			} else {
+				tc.msgCreate.ItemOutputs = nil
+			}
+
 			//End config
 
 			respCreate, err := srv.CreateTrade(wctx, &tc.msgCreate)
