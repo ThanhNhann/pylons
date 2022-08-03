@@ -355,6 +355,8 @@ func (suite *IntegrationTestSuite) TestFulfillTradeMsgServerSimple2() {
 				requesterAddr, _ := sdk.AccAddressFromBech32(tc.msgFulfill.Creator)
 				err := k.MintCoinsToAddr(ctx, requesterAddr, sdk.NewCoins(sdk.NewCoin("coin0", sdk.NewInt(10))))
 				require.NoError(err)
+				err = k.MintCoinsToAddr(ctx, requesterAddr, sdk.NewCoins(sdk.NewCoin("coin1", sdk.NewInt(10))))
+				require.NoError(err)
 
 				tc.msgFulfill.Items[0].CookbookId = fmt.Sprintf("%d", index)
 				tc.msgFulfill.Items[0].ItemId = fmt.Sprintf("%d", index)
@@ -365,13 +367,14 @@ func (suite *IntegrationTestSuite) TestFulfillTradeMsgServerSimple2() {
 					},
 				}
 				item := &types.Item{
-					Owner:       creator,
-					CookbookId:  fmt.Sprintf("%d", index),
-					Id:          fmt.Sprintf("%d", index),
-					TransferFee: sdk.Coins{sdk.NewCoin("coin0", sdk.NewInt(10)), sdk.NewCoin("coin1", sdk.NewInt(10))},
-					Tradeable:   true,
+					Owner:           creator,
+					CookbookId:      fmt.Sprintf("%d", index),
+					Id:              fmt.Sprintf("%d", index),
+					TransferFee:     sdk.Coins{sdk.NewCoin("coin0", sdk.NewInt(10)), sdk.NewCoin("coin1", sdk.NewInt(10))},
+					TradePercentage: sdk.OneDec(),
+					Tradeable:       true,
 				}
-				tc.msgCreate.CoinOutputs = sdk.Coins{sdk.NewCoin("coin0", sdk.NewInt(10))}
+				tc.msgCreate.CoinOutputs = sdk.Coins{sdk.NewCoin("coin0", sdk.NewInt(4)), sdk.NewCoin("coin1", sdk.NewInt(10))}
 				k.SetItem(ctx, *item)
 			} else {
 				tc.msgCreate.ItemOutputs = nil
