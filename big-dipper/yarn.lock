@@ -224,9 +224,9 @@
   version "3.0.0"
   resolved "https://registry.npmjs.org/@google-cloud/promisify/-/promisify-3.0.0.tgz"
 
-"@google-cloud/storage@^6.1.0", "@google-cloud/storage@^6.3.0":
-  version "6.3.0"
-  resolved "https://registry.yarnpkg.com/@google-cloud/storage/-/storage-6.3.0.tgz#0a9765416b659f54477da6611d9c12b914c04a61"
+"@google-cloud/storage@^6.1.0", "@google-cloud/storage@^6.4.0":
+  version "6.4.0"
+  resolved "https://registry.yarnpkg.com/@google-cloud/storage/-/storage-6.4.0.tgz#36413d549859ea325b71328e61dff7a669bc1f2e"
   dependencies:
     "@google-cloud/paginator" "^3.0.7"
     "@google-cloud/projectify" "^3.0.0"
@@ -245,7 +245,6 @@
     p-limit "^3.0.1"
     pumpify "^2.0.0"
     retry-request "^5.0.0"
-    stream-events "^1.0.4"
     teeny-request "^8.0.0"
     uuid "^8.0.0"
 
@@ -4488,7 +4487,7 @@ stream-browserify@^3.0.0:
     inherits "~2.0.4"
     readable-stream "^3.5.0"
 
-stream-events@^1.0.4, stream-events@^1.0.5:
+stream-events@^1.0.5:
   version "1.0.5"
   resolved "https://registry.npmjs.org/stream-events/-/stream-events-1.0.5.tgz"
   dependencies:
