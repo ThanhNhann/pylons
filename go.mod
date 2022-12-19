@@ -10,7 +10,7 @@ replace (
 
 require (
 	cosmossdk.io/errors v1.0.0-beta.7
-	cosmossdk.io/math v1.0.0-beta.3
+	cosmossdk.io/math v1.0.0-beta.4
 	github.com/Pylons-tech/pkcs7 v0.0.0-20220624080041-1a71f79c48ff
 	github.com/btcsuite/btcutil v1.0.3-0.20201208143702-a53e38424cce
 	github.com/cosmos/cosmos-sdk v0.46.1
@@ -23,7 +23,7 @@ require (
 	github.com/rogpeppe/go-internal v1.8.1
 	github.com/spf13/cast v1.5.0
 	github.com/spf13/cobra v1.5.0
-	github.com/stretchr/testify v1.8.0
+	github.com/stretchr/testify v1.8.1
 	github.com/tendermint/tendermint v0.34.21
 	github.com/tendermint/tm-db v0.6.7
 	github.com/zach-klippenstein/goregen v0.0.0-20160303162051-795b5e3961ea
