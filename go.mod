@@ -16,7 +16,7 @@ require (
 	github.com/cosmos/cosmos-sdk v0.46.1
 	github.com/cosmos/ibc-go/v5 v5.0.0-rc0
 	github.com/gogo/protobuf v1.3.3
-	github.com/golang/protobuf v1.5.2
+	github.com/golang/protobuf v1.5.3
 	github.com/google/cel-go v0.12.4
 	github.com/grpc-ecosystem/grpc-gateway v1.16.0
 	github.com/ignite/cli v0.23.0
