@@ -53,7 +53,7 @@ dependencies:
 
   pylons_sdk: 0.1.3
 
-  google_fonts: ^3.0.1
+  google_fonts: ^4.0.4
 
   fixnum: ^1.0.0
 
