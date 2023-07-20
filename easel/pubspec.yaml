@@ -40,7 +40,7 @@ dependencies:
 
   cached_network_image: ^3.1.0
 
-  flutter_svg: ^1.0.3
+  flutter_svg: ^2.0.5
 
 
   # file_picker plugin is used so we can pick single/multiple files with extension filtering support.
