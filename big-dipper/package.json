@@ -35,7 +35,7 @@
     "meteor-node-stubs": "^1.2.5",
     "moment": "^2.29.4",
     "moment-timezone": "^0.5.33",
-    "numbro": "^2.3.2",
+    "numbro": "^2.4.0",
     "plottable": "^3.9.0",
     "prop-types": "^15.7.2",
     "react": "^17.0.0",
