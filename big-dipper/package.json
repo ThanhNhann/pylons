@@ -36,7 +36,7 @@
     "moment": "^2.29.4",
     "moment-timezone": "^0.5.33",
     "numbro": "^2.3.2",
-    "plottable": "^3.9.0",
+    "plottable": "^4.0.0",
     "prop-types": "^15.7.2",
     "react": "^17.0.0",
     "react-3d-viewer": "^1.0.12",
